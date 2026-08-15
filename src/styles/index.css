@@ -1,0 +1,378 @@
+@import 'tailwindcss';
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS — "Pit Wall"
+   Carbon and machined metal. Red is a signal, never a surface.
+   ═══════════════════════════════════════════════════════════════════════ */
+@theme {
+  /* Surfaces — every step is a value shift, not a lighting effect */
+  --color-ink: #050506;
+  --color-carbon: #0a0a0c;
+  --color-surface: #101014;
+  --color-elevated: #16161b;
+
+  /* Signal */
+  --color-red: #ff1e00;
+  --color-red-deep: #b31200;
+
+  /* Neutrals — strictly tiered. The two dim tiers were originally set by eye
+     on a laptop panel; they measured under 4.5:1 on a large, further-away
+     monitor, which is where the mono labels stopped being readable. Both are
+     lifted to clear AA against --color-ink without collapsing the tiers. */
+  --color-white: #f4f5f7;
+  --color-silver: #a7acb2;
+  --color-slate: #868c93;
+
+  /* Data-only. These carry F1 timing semantics and never decorate. */
+  --color-purple: #b14bff;
+  --color-green: #00e676;
+  --color-amber: #ffc400;
+
+  --font-sans: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Machined, not rounded */
+  --radius-sm: 1px;
+  --radius-DEFAULT: 2px;
+  --radius-md: 3px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --breakpoint-xs: 26.25rem;
+}
+
+/* Non-Tailwind tokens */
+:root {
+  --edge: rgba(255, 255, 255, 0.07);
+  --edge-strong: rgba(255, 255, 255, 0.14);
+  --nav-h: 4.5rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════════════════ */
+@layer base {
+  html {
+    background: var(--color-ink);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-red-deep) transparent;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-ink);
+    color: var(--color-silver);
+    overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  section[id] {
+    scroll-margin-top: var(--nav-h);
+  }
+
+  canvas {
+    display: block;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-white);
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background: var(--color-red);
+    color: var(--color-white);
+  }
+
+  ::-webkit-scrollbar {
+    width: 3px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-ink);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-red-deep);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-red);
+    outline-offset: 3px;
+  }
+
+  * {
+    -webkit-tap-highlight-color: rgba(255, 30, 0, 0.15);
+  }
+
+  /* The custom cursor replaces the native one only while it is mounted */
+  html[data-cursor='on'],
+  html[data-cursor='on'] a,
+  html[data-cursor='on'] button,
+  html[data-cursor='on'] [role='button'] {
+    cursor: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Timing-board headline: condensed width axis + heavy weight */
+@utility display {
+  font-family: var(--font-sans);
+  font-variation-settings: 'wdth' 88, 'wght' 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.88;
+  color: var(--color-white);
+}
+
+@utility headline {
+  font-family: var(--font-sans);
+  font-variation-settings: 'wdth' 92, 'wght' 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+  color: var(--color-white);
+}
+
+/* Every label, number and status readout on the site */
+@utility data-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  /* 600, not 500: mono set this small and tracked this wide goes to hairline
+     strokes at 500, which is the first thing to disappear at viewing distance. */
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+@utility data-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-white);
+}
+
+@utility shell {
+  width: 100%;
+  max-width: 84rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .shell {
+    padding-inline: 2.5rem;
+  }
+}
+@media (min-width: 1280px) {
+  .shell {
+    padding-inline: 4rem;
+  }
+}
+
+/* 1px machined panel */
+@utility panel {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-DEFAULT);
+  --btn-ghost-fill: var(--color-surface);
+}
+
+/* Notched corner — reads as a cut carbon panel */
+@utility notch {
+  clip-path: polygon(0 0, calc(100% - 0.75rem) 0, 100% 0.75rem, 100% 100%, 0 100%);
+}
+
+@utility hairline {
+  height: 1px;
+  background: var(--edge);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   COMPONENT PRIMITIVES
+   ═══════════════════════════════════════════════════════════════════════ */
+@layer components {
+  /* Red tick that prefixes every section eyebrow */
+  .tick::before {
+    content: '';
+    display: inline-block;
+    width: 1.5rem;
+    height: 2px;
+    background: var(--color-red);
+    vertical-align: middle;
+    margin-right: 0.75rem;
+  }
+
+  /* Left-edge wipe on hover — the telemetry-card motif, rebuilt. `--tone`
+     lets a row carry its own accent; red when nothing sets it. */
+  .edge-wipe::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    width: 2px;
+    height: 0;
+    background: var(--tone, var(--color-red));
+    transition: height 0.4s var(--ease-out-expo);
+  }
+  .edge-wipe:hover::before,
+  .edge-wipe:focus-within::before,
+  .edge-wipe[data-open='true']::before {
+    height: 100%;
+  }
+
+  /* Fine carbon-weave overlay — 2 crossing gradients, no image request */
+  .weave {
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.018) 0 1px,
+        transparent 1px 6px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.018) 0 1px,
+        transparent 1px 6px
+      );
+  }
+
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, var(--edge) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--edge) 1px, transparent 1px);
+    background-size: 5rem 5rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    padding: 0.9375rem 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    clip-path: polygon(0 0, calc(100% - 0.625rem) 0, 100% 0.625rem, 100% 100%, 0 100%);
+    transition:
+      background-color 0.3s var(--ease-out-expo),
+      border-color 0.3s var(--ease-out-expo),
+      color 0.3s var(--ease-out-expo);
+  }
+
+  .btn-primary {
+    background: var(--color-red);
+    color: var(--color-white);
+  }
+  .btn-primary:hover {
+    background: var(--color-red-deep);
+  }
+
+  /* The outline is a clipped background with an inset fill on top, not a
+     `border`: a real border would be sliced off by the notch and read as a
+     broken edge. This way the 1px line follows the cut corner exactly. */
+  .btn-ghost {
+    position: relative;
+    isolation: isolate;
+    background: var(--edge-strong);
+    color: var(--color-white);
+  }
+  .btn-ghost::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    /* Containers that sit on a lighter surface re-declare this fill so the
+       inset never shows as a lighter rectangle inside the outline. */
+    background: var(--btn-ghost-fill, var(--color-ink));
+    clip-path: polygon(0 0, calc(100% - 0.5625rem) 0, 100% 0.5625rem, 100% 100%, 0 100%);
+  }
+  .btn-ghost:hover {
+    background: var(--color-red);
+    color: var(--color-red);
+  }
+
+  /* Stacked buttons share one width on narrow screens */
+  @media (max-width: 30rem) {
+    .btn-row > *,
+    .btn-row .btn {
+      width: 100%;
+    }
+  }
+
+  /* Line-mask reveal: the mask is CSS, the transform is Framer's */
+  .mask-line {
+    display: block;
+    overflow: hidden;
+  }
+}
+
+/* Marquee — pure CSS so it never touches the main thread */
+@keyframes slide-x {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.marquee-track {
+  animation: slide-x var(--marquee-duration, 42s) linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+}
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Touch devices: hover states must not stick */
+@media (hover: none) {
+  .edge-wipe:hover::before {
+    height: 0;
+  }
+  .btn-ghost:hover {
+    border-color: var(--edge-strong);
+    color: var(--color-white);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .pulse-dot {
+    animation: none;
+  }
+}
