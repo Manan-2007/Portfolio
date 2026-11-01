@@ -9,6 +9,12 @@
    blank pages while still answering 200. The form that renders is
    `/verify/<id>` for a course and `/specialization/<id>` for a
    specialisation.
+
+   Eight of twenty held credentials are listed. The Google specialisation
+   subsumes its four component courses, so listing the parts would spend
+   four cards on one credential; the Python intro courses and the Excel
+   course are left off because the roster leads with AI and cloud. Python
+   Data Structures stays as the single fundamentals card.
    ──────────────────────────────────────────────────────────────────────── */
 
 export const certificates = [
@@ -86,41 +92,6 @@ export const certificates = [
     year: '2025',
     type: 'Certificate',
     href: 'https://www.coursera.org/account/accomplishments/verify/2YZNHI0UN759',
-  },
-  {
-    title: 'Using Python to Access Web Data',
-    issuer: 'University of Michigan',
-    mono: 'UM',
-    year: '2025',
-    type: 'Certificate',
-    href: 'https://www.coursera.org/account/accomplishments/verify/92EKFGLKE3OE',
-  },
-  {
-    title: 'Crash Course on Python',
-    issuer: 'Google',
-    icon: 'google',
-    year: '2025',
-    type: 'Certificate',
-    href: 'https://www.coursera.org/account/accomplishments/verify/TKAGYCEAWZUG',
-  },
-  {
-    title: 'Programming for Everybody',
-    issuer: 'University of Michigan',
-    mono: 'UM',
-    year: '2025',
-    type: 'Certificate',
-    href: 'https://www.coursera.org/account/accomplishments/verify/K76V91UQ8ZHQ',
-  },
-  {
-    /* Coursera has since renamed this course "Excel for Data Analysis:
-       Essential Skills & Techniques"; LinkedIn still shows the old title
-       "Excel Basics for Data Analysis". The verify link is authoritative. */
-    title: 'Excel for Data Analysis',
-    issuer: 'IBM',
-    icon: 'ibm',
-    year: '2025',
-    type: 'Certificate',
-    href: 'https://www.coursera.org/account/accomplishments/verify/R3H9HS663F1K',
   },
 ]
 
