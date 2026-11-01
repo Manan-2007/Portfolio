@@ -1,0 +1,193 @@
+%% Manan Kochhar — resume
+%%
+%% Rebuilt 2026-11-01. The previous PDF was compiled in Overleaf and the source
+%% was never kept, so it drifted: it shipped a literal "+91-XXXXXXXXXX"
+%% placeholder for six months, carried the wrong graduation years, and labelled
+%% the Azure AI Fundamentals (AI-900) badge as "Azure Fundamentals (AZ-900)".
+%% Keeping this file in the repo is what stops that happening again — Overleaf
+%% can sync from GitHub, so the editor still works.
+%%
+%% Build:  tectonic resume.tex        (or)  pdflatex resume.tex
+%% Then:   cp resume.pdf ../public/resume.pdf
+
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{xcolor}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Margins
+\addtolength{\oddsidemargin}{-0.6in}
+\addtolength{\evensidemargin}{-0.6in}
+\addtolength{\textwidth}{1.2in}
+\addtolength{\topmargin}{-0.7in}
+\addtolength{\textheight}{1.4in}
+
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Section headings: small caps over a hairline rule
+\titleformat{\section}{\vspace{-4pt}\scshape\raggedright\large}
+  {}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% ─── Macros ──────────────────────────────────────────────────────────────
+\newcommand{\resumeItem}[1]{\item\small{#1 \vspace{-2pt}}}
+
+\newcommand{\resumeSubheading}[4]{%
+  \vspace{-2pt}\item
+  \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+    \textbf{#1} & #2 \\
+    \textit{\small#3} & \textit{\small #4} \\
+  \end{tabular*}\vspace{-7pt}
+}
+
+% Project line: name | stack | links
+\newcommand{\resumeProject}[3]{%
+  \vspace{-1pt}\item
+  \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+    \small\textbf{#1} $|$ \emph{\small#2} & \small#3 \\
+  \end{tabular*}\vspace{-6pt}
+}
+
+% Certification line: title left, issuer and year right
+\newcommand{\resumeCert}[3]{%
+  \vspace{1pt}\item
+  \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+    \small#1 & \small#2 $\cdot$ #3 \\
+  \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.14in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}[leftmargin=0.26in, itemsep=0pt, parsep=0pt, topsep=2pt]}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-4pt}}
+
+% ─── Document ────────────────────────────────────────────────────────────
+\begin{document}
+
+\begin{center}
+  {\Huge \scshape Manan Kochhar} \\ \vspace{5pt}
+  \small
+  +91 98156 57529 $|$
+  \href{mailto:kochharmanan20@gmail.com}{kochharmanan20@gmail.com} $|$
+  \href{https://manan-portfolio-03.vercel.app}{manan-portfolio-03.vercel.app} \\ \vspace{2pt}
+  \href{https://www.linkedin.com/in/manan-kochhar-b57a56211/}{linkedin/manan-kochhar} $|$
+  \href{https://github.com/Manan-2007}{github/Manan-2007} $|$
+  \href{https://leetcode.com/u/Manan-2007/}{leetcode/Manan-2007}
+\end{center}
+
+% ─── Education ───────────────────────────────────────────────────────────
+\section{Education}
+\resumeSubHeadingListStart
+  \resumeSubheading
+    {Chitkara University}{Chandigarh, India}
+    {Bachelor of Engineering --- Computer Science Engineering, AI/ML Specialisation}{2025 -- 2029}
+  \resumeItemListStart
+    \resumeItem{Relevant coursework: Machine Learning, Data Structures \& Algorithms, Operating Systems, DBMS, Cloud Computing}
+  \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+% ─── Experience ──────────────────────────────────────────────────────────
+\section{Experience}
+\resumeSubHeadingListStart
+
+  \resumeSubheading
+    {AI Engineer --- Kinetic City}{Chandigarh, India}
+    {Finvasia Innovation Hackathon 2026 (Evolve-i) $\cdot$ Team Finbros $\cdot$ Track-1 PS-3}{Jan 2026}
+  \resumeItemListStart
+    \resumeItem{Built an AI companion for first-time Indian retail investors, aimed at the fear that stops people investing at all}
+    \resumeItem{Implemented Monte Carlo SIP portfolio simulation with rupee-framed output to cut decision paralysis}
+    \resumeItem{Measured the result against investor confidence rather than model accuracy}
+  \resumeItemListEnd
+
+  \resumeSubheading
+    {Speech-to-Text Pipeline Lead --- ASHA-VANI}{Remote}
+    {Hinglish Voice AI Pipeline $\cdot$ Team Project}{2025}
+  \resumeItemListStart
+    \resumeItem{Led the end-to-end STT pipeline for ASHA health workers using Faster-Whisper and Silero VAD on an RTX 40-series GPU}
+    \resumeItem{Added Hinglish and Bhojpuri support; benchmarked word error rate with \texttt{jiwer} across real-world audio conditions}
+    \resumeItem{Authored a contract spec fixing 16\,kHz mono int16 PCM so four developers could integrate against one audio format}
+  \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+% ─── Projects ────────────────────────────────────────────────────────────
+\section{Projects}
+\resumeSubHeadingListStart
+
+  \resumeProject
+    {Dhan Drishti}{TypeScript, React, Fastify, SQLite, Drizzle}
+    {\href{https://github.com/Manan-2007/Dhan_Drishti}{GitHub}}
+  \resumeItemListStart
+    \resumeItem{Self-hosted multi-broker portfolio tracker where every figure on the dashboard derives from a normalised transaction ledger}
+    \resumeItem{Exact-decimal money end to end behind a pure, deterministic calculation engine covered by 352 tests; imports across 7 sources are idempotent, atomic and reconciled against each broker's own P\&L report}
+  \resumeItemListEnd
+
+  \resumeProject
+    {Voice Emotion Detection}{Python, PyTorch, FastAPI, WebSockets}
+    {\href{https://github.com/Manan-2007/voice-emotion-detection}{GitHub}}
+  \resumeItemListStart
+    \resumeItem{Real-time speech emotion recognition over a four-model ensemble, with a neural VAD segmenting audio into complete utterances}
+    \resumeItem{Built a two-corpus evaluation harness and used it to measure and drop several additions the numbers did not support; sub-second latency, analysed locally and never recorded}
+  \resumeItemListEnd
+
+  \resumeProject
+    {Virtual Keyboard \& Air Mouse}{Python, OpenCV, MediaPipe, macOS Quartz}
+    {\href{https://github.com/Manan-2007/virtual-keyboard-mouse}{GitHub}}
+  \resumeItemListStart
+    \resumeItem{Webcam-only touchless input: per-hand role assignment drives a 40-key on-screen keyboard and the real OS cursor}
+    \resumeItem{Injects keystrokes and clicks at the operating-system level, so input lands in whatever application is focused; renders as a click-through overlay on macOS}
+  \resumeItemListEnd
+
+  \resumeProject
+    {Muse. v2}{TypeScript, React, Socket.io, Prisma, PostgreSQL}
+    {\href{https://github.com/Manan-2007/Muse._v2}{GitHub} $\cdot$ \href{https://muse-music-v2.vercel.app}{Live}}
+  \resumeItemListStart
+    \resumeItem{Social listening platform whose rooms stay in sync from a single socket event carrying track and start time, rather than streaming audio between clients}
+    \resumeItem{Content-based recommender weighting four taste signals into a per-user profile; canvas turntable with drag-to-scrub seeking}
+  \resumeItemListEnd
+
+  \resumeProject
+    {Synora}{JavaScript, React, Express, MySQL}
+    {\href{https://github.com/Manan-2007/Synora}{GitHub} $\cdot$ \href{https://synora-v1.vercel.app}{Live}}
+  \resumeItemListStart
+    \resumeItem{Student workspace unifying tasks, timetable, attendance, CGPA and notes on a 20-table MySQL schema built around the subject list}
+    \resumeItem{Seven runtime dependencies in total; the API self-migrates, applying missing tables and columns on its first request after a deploy}
+  \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+% ─── Certifications ──────────────────────────────────────────────────────
+\section{Certifications}
+\resumeSubHeadingListStart
+  \resumeCert{\href{https://www.credly.com/badges/5847bf49-b3f6-4474-bb38-352728c156e9/public_url}{Microsoft Certified: Azure AI Fundamentals (AI-900)}}{Microsoft}{2025}
+  \resumeCert{\href{https://www.coursera.org/account/accomplishments/certificate/DLJS3455NNEW}{Develop Generative AI Applications}}{IBM}{2026}
+  \resumeCert{\href{https://www.coursera.org/account/accomplishments/certificate/9BE91E3XN6NS}{Build RAG Applications}}{IBM}{2026}
+  \resumeCert{\href{https://www.coursera.org/account/accomplishments/specialization/certificate/VDTRCKLK20LY}{Introduction to Generative AI Learning Path}}{Google}{2026}
+\resumeSubHeadingListEnd
+
+% ─── Skills ──────────────────────────────────────────────────────────────
+\section{Technical Skills}
+\begin{itemize}[leftmargin=0.14in, label={}]
+  \small{\item{
+    \textbf{Languages}{: Python, C, C++, JavaScript, TypeScript, SQL} \\
+    \textbf{AI \& ML}{: PyTorch, TensorFlow, Keras, Scikit-learn, Hugging Face, LangChain, Faster-Whisper, Silero VAD} \\
+    \textbf{Vision \& Speech}{: OpenCV, MediaPipe, Whisper, NumPy, Pandas} \\
+    \textbf{Web}{: React, Next.js, Node.js, FastAPI, Flask, Express, Tailwind CSS, Vite} \\
+    \textbf{Data, Cloud \& Tools}{: PostgreSQL, MySQL, SQLite, Microsoft Azure, Docker, Git, NVIDIA CUDA}
+  }}
+\end{itemize}
+
+\end{document}
