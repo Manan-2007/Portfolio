@@ -1,194 +1,138 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+import {
+  DOMAIN,
+  FluidSolver,
+  PARTICLE_COUNT,
+  SPREAD_Y,
+} from './fluid/FluidSolver'
+import { streakFrag, streakVert } from './fluid/glsl'
 
 /* ────────────────────────────────────────────────────────────────────────
-   AeroField — a wind-tunnel flow visualisation.
+   AeroField — a wind tunnel, actually solved.
 
-   ~4,600 streaklines travel along +X past an invisible aerofoil body. Each
-   streak is a two-vertex line segment; the head and tail are displaced by
-   the same analytic flow field in the vertex shader, so the whole thing is
-   one draw call with zero per-particle CPU work. Where the flow accelerates
-   around the body it heats from silver to red — the same way a pressure
-   map reads in CFD.
+   8,192 streaklines are carried through an incompressible Navier–Stokes
+   field computed on the GPU every frame, past a NACA symmetric section at
+   eight degrees of incidence. Nothing here is a curve shaped to look like
+   flow: the streaks go where the solver sends them, which is why the wake
+   sheds a vortex street on its own rather than being told to.
+
+   Colour is speed relative to freestream — the same quantity a CFD pressure
+   map shows. Silver is undisturbed air; red is the acceleration over the
+   suction surface.
+
+   The solver lives in FluidSolver.js. This file is the part React owns: the
+   geometry, the material, and one `step()` per frame.
    ──────────────────────────────────────────────────────────────────────── */
-
-const COUNT = 6400
-const SPAN = 22 // wrap length along the flow axis, wider than the frustum
-const SPREAD_Y = 5.0
-const SPREAD_Z = 3.4
-
-const vertexShader = /* glsl */ `
-  uniform float uTime;
-  uniform vec2  uPointer;
-  uniform float uSpan;
-  uniform float uIntensity;
-
-  attribute vec3  aOrigin;
-  attribute float aSpeed;
-  attribute float aTail;
-  attribute float aLength;
-
-  varying float vHeat;
-  varying float vFade;
-  varying float vTail;
-
-  // Analytic flow around an implicit ellipsoid body sitting at the origin.
-  // Applied per-vertex, so head and tail curve independently — that is what
-  // makes a streak bend as it passes the body instead of sliding sideways.
-  vec3 body(vec3 p, out float speedup) {
-    vec2  radial = p.yz / vec2(1.0, 0.62);
-    float dist   = length(radial);
-    // Influence is strongest level with the body and decays fore and aft.
-    float axial  = exp(-p.x * p.x * 0.42);
-    // The constant in the denominator caps the displacement on the stagnation
-    // line — without it the centre streaks pile into one hot horizontal band.
-    float push   = axial * 1.25 / (0.85 + dist * dist * 2.0);
-    vec2  dir    = dist > 1e-4 ? radial / dist : vec2(0.0, 1.0);
-
-    p.yz += dir * push;
-    speedup = push;
-    return p;
-  }
-
-  void main() {
-    // Head position wraps within the span; the tail trails behind it.
-    float travelled = aOrigin.x + uTime * aSpeed;
-    float xHead = mod(travelled + uSpan * 0.5, uSpan) - uSpan * 0.5;
-    float x = xHead - aTail * aLength;
-
-    float speedup;
-    vec3 pos = body(vec3(x, aOrigin.y, aOrigin.z), speedup);
-
-    // Pointer wake — a second, softer pressure source travelling with the
-    // mouse. Solved once from the head and applied to both vertices: solving
-    // it per-vertex shears every streak into a spike near the cursor.
-    vec2  toPointer = vec2(xHead, aOrigin.y) - vec2(uPointer.x * 5.0, -uPointer.y * 2.6);
-    float pd        = length(toPointer);
-    float wake      = uIntensity * 0.75 / (0.7 + pd * pd * 1.5);
-    pos.xy += (pd > 1e-4 ? toPointer / pd : vec2(0.0, 1.0)) * wake;
-    speedup += wake * 0.75;
-
-    vHeat = speedup;
-    vTail = aTail;
-    // Dissolve near the wrap boundary so recycling is never visible.
-    vFade = 1.0 - smoothstep(5.5, 9.5, abs(xHead));
-
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-  }
-`
-
-const fragmentShader = /* glsl */ `
-  precision mediump float;
-
-  uniform vec3  uCool;
-  uniform vec3  uHot;
-  uniform float uOpacity;
-
-  varying float vHeat;
-  varying float vFade;
-  varying float vTail;
-
-  void main() {
-    vec3  color = mix(uCool, uHot, smoothstep(0.22, 1.05, vHeat));
-    // Heads read solid, tails dissolve — that difference is the motion blur.
-    float alpha = uOpacity * vFade * (0.34 + vHeat * 0.9) * (1.0 - vTail * 0.85);
-    if (alpha <= 0.004) discard;
-    gl_FragColor = vec4(color, alpha);
-  }
-`
 
 export default function AeroField({ pointerRef, opacity = 1 }) {
   const material = useRef(null)
-  const { viewport } = useThree()
+  const solverRef = useRef(null)
+  const { gl, viewport } = useThree()
+
+  // The pointer's own velocity is what it pushes the air with — a stationary
+  // cursor should disturb nothing, however long it sits there.
+  const pointerState = useRef({
+    world: new THREE.Vector2(0, 0),
+    last: new THREE.Vector2(0, 0),
+    dir: new THREE.Vector2(0, 0),
+    strength: 0,
+  })
+
+  const solver = useMemo(() => new FluidSolver(gl), [gl])
+  solverRef.current = solver
+
+  useEffect(() => () => solver.dispose(), [solver])
 
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry()
+    const { refs, tails } = FluidSolver.particleRefs()
 
-    const verts = COUNT * 2
-    const position = new Float32Array(verts * 3) // written by the shader
-    const origin = new Float32Array(verts * 3)
-    const speed = new Float32Array(verts)
-    const tail = new Float32Array(verts)
-    const length = new Float32Array(verts)
-
-    for (let i = 0; i < COUNT; i++) {
-      const x = Math.random() * SPAN - SPAN * 0.5
-
-      // Bias the sample toward the centreline so the body sits in dense flow
-      // while the outer field stays sparse enough to read as background.
-      const yBias = Math.random() ** 1.25
-      const y = (Math.random() < 0.5 ? -1 : 1) * yBias * SPREAD_Y
-      const z = (Math.random() * 2 - 1) * SPREAD_Z
-
-      const v = 1.6 + Math.random() * 3.6
-      // Long enough to read as a streak rather than a speck; the spread in
-      // lengths is what makes the field look like it has depth.
-      const len = 0.5 + Math.random() * 1.9
-
-      for (let k = 0; k < 2; k++) {
-        const idx = i * 2 + k
-        origin[idx * 3] = x
-        origin[idx * 3 + 1] = y
-        origin[idx * 3 + 2] = z
-        speed[idx] = v
-        tail[idx] = k // 0 = head, 1 = tail
-        length[idx] = len
-      }
-    }
+    // The vertex shader computes every position from the particle texture;
+    // this attribute exists only because a BufferGeometry must have one.
+    const position = new Float32Array(PARTICLE_COUNT * 2 * 3)
 
     geo.setAttribute('position', new THREE.BufferAttribute(position, 3))
-    geo.setAttribute('aOrigin', new THREE.BufferAttribute(origin, 3))
-    geo.setAttribute('aSpeed', new THREE.BufferAttribute(speed, 1))
-    geo.setAttribute('aTail', new THREE.BufferAttribute(tail, 1))
-    geo.setAttribute('aLength', new THREE.BufferAttribute(length, 1))
-    // The shader owns every vertex position, so leave culling to the fade.
-    geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), SPAN)
+    geo.setAttribute('aRef', new THREE.BufferAttribute(refs, 2))
+    geo.setAttribute('aTail', new THREE.BufferAttribute(tails, 1))
+    geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), DOMAIN.x)
 
     return geo
   }, [])
 
+  useEffect(() => () => geometry.dispose(), [geometry])
+
   const uniforms = useMemo(
     () => ({
-      uTime: { value: 0 },
-      uPointer: { value: new THREE.Vector2(0, 0) },
-      uSpan: { value: SPAN },
-      uIntensity: { value: 0 },
+      uParticles: { value: null },
+      uVelocity: { value: null },
+      uMin: { value: new THREE.Vector2(-DOMAIN.x * 0.5, -DOMAIN.y * 0.5) },
+      uSize: { value: new THREE.Vector2(DOMAIN.x, DOMAIN.y) },
+      uFreestream: { value: solver.freestream },
+      // A streak's length is its speed, so this is the gain on the one cue
+      // that reads without colour at all.
+      uTailScale: { value: 0.17 },
       uOpacity: { value: opacity },
       uCool: { value: new THREE.Color('#aeb6bf') },
       uHot: { value: new THREE.Color('#ff1e00') },
     }),
-    [opacity]
+    [opacity, solver]
   )
 
   useFrame((state, delta) => {
     const u = material.current?.uniforms
     if (!u) return
 
-    // Clamp delta: resuming a paused frameloop must not fast-forward the flow.
-    u.uTime.value += Math.min(delta, 0.05)
+    // Clamp: resuming a paused frameloop must not fast-forward the solver,
+    // and a long frame must not push the advection trace past a cell.
+    const dt = Math.min(delta, 1 / 45)
 
     const p = pointerRef?.current
+    const ps = pointerState.current
     if (p) {
-      u.uPointer.value.set(p.x, p.y)
-      // The wake only builds once the pointer has actually moved off centre.
-      const moved = Math.min(1, Math.hypot(p.x, p.y) * 1.4)
-      u.uIntensity.value += (moved - u.uIntensity.value) * 0.05
+      // Pointer arrives in normalised screen space; the solver works in
+      // world units, and the tunnel is wider than it is tall.
+      ps.world.set(p.x * DOMAIN.x * 0.42, -p.y * SPREAD_Y * 0.9)
+      const dx = ps.world.x - ps.last.x
+      const dy = ps.world.y - ps.last.y
+      const moved = Math.hypot(dx, dy)
+
+      if (moved > 1e-4) {
+        ps.dir.set(dx / moved, dy / moved)
+      }
+      // Ease toward the travel speed rather than tracking it directly, so a
+      // flick leaves a wake that decays instead of a single-frame spike.
+      const target = Math.min(1, moved / (dt * 14))
+      ps.strength += (target - ps.strength) * 0.12
+      ps.last.copy(ps.world)
+    } else {
+      ps.strength *= 0.9
     }
 
-    // Portrait viewports see a narrower slice — lift opacity to compensate.
+    solver.step(
+      dt,
+      ps.strength > 0.01 ? ps.world : null,
+      ps.strength * 9.0,
+      ps.dir
+    )
+
+    u.uParticles.value = solver.particleTexture
+    u.uVelocity.value = solver.velocityTexture
     u.uOpacity.value = opacity * (viewport.aspect < 1 ? 1.25 : 1)
   })
 
   return (
     <lineSegments geometry={geometry} frustumCulled={false}>
-      <shaderMaterial
+      <rawShaderMaterial
         ref={material}
         uniforms={uniforms}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
+        vertexShader={streakVert}
+        fragmentShader={streakFrag}
+        glslVersion={THREE.GLSL3}
         transparent
         depthWrite={false}
+        depthTest={false}
         blending={THREE.AdditiveBlending}
       />
     </lineSegments>
