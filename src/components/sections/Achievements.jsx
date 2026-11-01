@@ -70,7 +70,7 @@ export default function Achievements() {
         index="04"
         eyebrow="Achievements"
         title="Certificates & Specializations"
-        note="Verified credentials from Microsoft, Google, IBM and DeepLearning.AI — every card links straight to the issuer."
+        note="Verified credentials from Microsoft, Google, IBM, DeepLearning.AI and the University of Michigan — every card links straight to the issuer."
       />
 
       <RevealGroup

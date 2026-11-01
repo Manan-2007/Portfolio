@@ -22,7 +22,7 @@ export default function Work() {
         index="02"
         eyebrow="Work"
         title="Featured Projects"
-        note="Things I have built to solve a real problem — computer vision, speech, and interfaces people actually touch."
+        note="Things I have built to solve a real problem — computer vision, speech, applied AI, and the systems people actually touch."
       />
 
       {/* Colour key for the row numbers */}

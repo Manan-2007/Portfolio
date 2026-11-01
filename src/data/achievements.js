@@ -6,8 +6,11 @@
 
 export const certificates = [
   {
-    title: 'Azure Fundamentals',
-    code: 'AZ-900',
+    /* The Credly badge reads "Microsoft Certified: Azure AI Fundamentals",
+       issued 2025-11-17. It was previously labelled here as AZ-900, which is
+       a different exam — the badge link made that checkable in one click. */
+    title: 'Azure AI Fundamentals',
+    code: 'AI-900',
     issuer: 'Microsoft',
     icon: 'microsoft',
     year: '2025',

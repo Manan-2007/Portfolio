@@ -2,6 +2,9 @@
    Featured work. Descriptions, stacks and links are drawn from each repo's
    own README and GitHub metadata — nothing here is invented, including the
    three figures each project reports on itself.
+
+   Ordered strongest first; Work.jsx opens projects[0] by default, so row 01
+   is the one thing a visitor is guaranteed to read.
    ──────────────────────────────────────────────────────────────────────── */
 
 /* Categorical colour coding for the project numbers. These are the palette's
@@ -10,7 +13,7 @@ export const disciplines = {
   vision: { label: 'Computer Vision', tone: 'var(--color-green)' },
   speech: { label: 'Speech & Audio', tone: 'var(--color-amber)' },
   ai: { label: 'Applied AI', tone: 'var(--color-purple)' },
-  web: { label: 'Web & 3D', tone: 'var(--color-red)' },
+  web: { label: 'Web & Systems', tone: 'var(--color-red)' },
 }
 
 export const projects = [
@@ -35,7 +38,77 @@ export const projects = [
     ],
     stack: ['Python', 'PyTorch', 'FastAPI', 'WebSockets', 'TensorFlow', 'TypeScript'],
     repo: 'https://github.com/Manan-2007/voice-emotion-detection',
-    featured: true,
+    study: true,
+  },
+  {
+    id: 'dhan-drishti',
+    name: 'Dhan Drishti',
+    kind: 'Portfolio & Wealth Tracker',
+    discipline: 'web',
+    year: '2026',
+    headline: 'Every figure traces back to a real transaction.',
+    summary:
+      'A self-hosted wealth tracker that consolidates exports from every broker into one normalised ledger, then derives holdings, returns and net worth from it. Nothing on the dashboard is a placeholder, and only public tickers ever reach the outside world.',
+    detail: [
+      'Money is never a float — exact decimals end to end, behind a pure, deterministic calculation engine that does no I/O and is covered by 352 tests.',
+      'Every broker sits behind one adapter interface, so imports are idempotent, deduped and atomic: a file is detected, normalised, validated and previewed, then committed all-or-nothing and reconciled against the broker’s own P&L report.',
+      'Gaps are repaired rather than guessed — stock splits missing from an export are filled from public data only after being confirmed against your own trade prices, and anything invalid is reported instead of inferred.',
+    ],
+    stats: [
+      { label: 'Tests passing', value: '352' },
+      { label: 'Import sources', value: '7' },
+      { label: 'Float arithmetic', value: '0' },
+    ],
+    stack: ['TypeScript', 'React', 'Fastify', 'SQLite', 'Drizzle', 'decimal.js'],
+    repo: 'https://github.com/Manan-2007/Dhan_Drishti',
+    study: true,
+  },
+  {
+    id: 'virtual-keyboard-mouse',
+    name: 'Virtual Keyboard & Air Mouse',
+    kind: 'Touchless Input System',
+    discipline: 'vision',
+    year: '2026',
+    headline: 'Two hands become two real input devices.',
+    summary:
+      'A computer-vision input system that lets you type and drive the OS cursor with nothing but a webcam. Keystrokes and clicks are injected at the operating-system level, so what you type in the air lands in whatever app is actually focused.',
+    detail: [
+      'The hand tracker labels each hand and gives it a job — right hand steers the real cursor (pinch to click, hold to drag), left hand types on an on-screen keyboard.',
+      'Full layout: number row, three letter rows, and a function row with shift, backspace, space and enter.',
+      'On macOS the keyboard renders as a transparent, click-through overlay above every app and Space, so the target window stays visible on a single laptop screen.',
+    ],
+    stats: [
+      { label: 'Keys', value: '40' },
+      { label: 'Hands tracked', value: '2' },
+      { label: 'Input', value: 'OS-level' },
+    ],
+    stack: ['Python', 'OpenCV', 'MediaPipe', 'NumPy', 'macOS Quartz'],
+    repo: 'https://github.com/Manan-2007/virtual-keyboard-mouse',
+    study: true,
+  },
+  {
+    id: 'muse-v2',
+    name: 'Muse. v2',
+    kind: 'Social Listening Platform',
+    discipline: 'web',
+    year: '2026',
+    headline: 'A record you can touch, in a room that hears the same second.',
+    summary:
+      'A full-stack music platform built around a turntable you actually scrub, and rooms where every device lands on the same second of the same song. The ground-up rebuild of Muse v1, with a real backend underneath it.',
+    detail: [
+      'Rooms do not stream audio to each other. One socket event carries what is playing and the moment it started, and every client computes `now − startedAt` to find the needle — agreeing on a timeline rather than shipping a file is what keeps devices in sync.',
+      'The recommender is content-based rather than collaborative: four taste signals — plays, likes, playlist adds and onboarding picks — are weighted into a profile, so it works from your own signal with no crowd required.',
+      'The turntable is canvas, not video — the vinyl spins, the tonearm tracks, a beat-ring rides the rim, and dragging the disc seeks the track.',
+    ],
+    stats: [
+      { label: 'Room sync', value: '1 event' },
+      { label: 'Taste signals', value: '4' },
+      { label: 'Realtime', value: 'Socket.io' },
+    ],
+    stack: ['TypeScript', 'React', 'Socket.io', 'Prisma', 'PostgreSQL', 'Express'],
+    repo: 'https://github.com/Manan-2007/Muse._v2',
+    study: true,
+    live: 'https://muse-music-v2.vercel.app',
   },
   {
     id: 'dibz',
@@ -59,7 +132,54 @@ export const projects = [
     stack: ['TypeScript', 'Next.js', 'Gemini', 'Tailwind', 'PWA'],
     repo: 'https://github.com/Manan-2007/DIBZ',
     live: 'https://dibz-v1.vercel.app',
-    featured: true,
+    study: true,
+  },
+  {
+    id: 'synora',
+    name: 'Synora',
+    kind: 'Student Workspace',
+    discipline: 'web',
+    year: '2026',
+    headline: 'One calm home for everything you are studying.',
+    summary:
+      'Tasks, timetable, notes, a focus timer, CGPA, attendance and achievements in a single workspace, with the subject list as the hub every other feature points at. Shipped, installable, and running on a real relational schema.',
+    detail: [
+      'Twenty tables in MySQL; nineteen are owned by a user and cascade on delete, so removing an account removes everything it owns. The API adds whatever columns are missing on its first request after a deploy.',
+      'Renaming a subject updates the timetable, attendance, grades and tasks at once — subjects sit at the centre of the schema instead of having their names copied across features.',
+      'Seven runtime dependencies in total across app and API, and hand-written CSS with design tokens rather than a UI kit. Light and dark are both built, not themed on afterwards.',
+    ],
+    stats: [
+      { label: 'Tables', value: '20' },
+      { label: 'Runtime deps', value: '7' },
+      { label: 'Themes', value: '2' },
+    ],
+    stack: ['JavaScript', 'React', 'Express', 'MySQL', 'Vite'],
+    repo: 'https://github.com/Manan-2007/Synora',
+    study: true,
+    live: 'https://synora-v1.vercel.app',
+  },
+  {
+    id: 'saahas',
+    name: 'SAAHAS',
+    kind: 'Trauma-Informed Support App',
+    discipline: 'speech',
+    year: '2026',
+    headline: 'A voice check-in that hears tone, not words.',
+    summary:
+      'A trauma-informed sanctuary app whose Voice Companion check-in runs on a local speech-emotion service. I built the voice half — the FastAPI inference backend and the way the React app consumes it.',
+    detail: [
+      'The models from my own speech-emotion work are wired in here as a service, which is where that ensemble had to survive contact with somebody else’s interface rather than its own demo.',
+      'Inference stays local: a FastAPI process loads roughly 3.5 GB of checkpoints on first run and analyses in-process, so no audio is uploaded anywhere.',
+      'The interface degrades honestly — until the backend has finished loading, the Voice Companion says voice analysis is offline and offers a retry instead of failing silently.',
+    ],
+    stats: [
+      { label: 'Model size', value: '3.5 GB' },
+      { label: 'Services', value: '2' },
+      { label: 'Inference', value: 'Local' },
+    ],
+    stack: ['Python', 'PyTorch', 'FastAPI', 'React', 'Vite', 'Tailwind'],
+    repo: 'https://github.com/Manan-2007/SAAHAS',
+    study: true,
   },
   {
     id: 'kinetic-city',
@@ -72,39 +192,17 @@ export const projects = [
       'An interactive learning platform that turns financial concepts into a navigable cityscape driven by live market data. Built as AI Engineer with Team Finbros for the Finvasia Innovation Hackathon.',
     detail: [
       'Curriculum tracks — Foundations, Technical Analysis, Wealth Building — each backed by interactive dashboards over real-time stock data.',
-      'KINU, an AI mentor running on Gemini, answers in the context of whatever the learner is currently looking at.',
+      'KINU, an AI mentor on Azure OpenAI GPT-4o, answers in the context of whatever the learner is currently looking at, and shifts register across four kinds of investor fear.',
       'React + TypeScript + Zustand front end against a FastAPI service pulling market data through yfinance.',
     ],
     stats: [
       { label: 'Learning tracks', value: '3' },
-      { label: 'AI mentor', value: 'Gemini' },
+      { label: 'AI mentor', value: 'GPT-4o' },
       { label: 'Data feed', value: 'yfinance' },
     ],
-    stack: ['TypeScript', 'React', 'Zustand', 'Python', 'FastAPI', 'Gemini'],
+    stack: ['TypeScript', 'React', 'Zustand', 'Python', 'FastAPI', 'Azure OpenAI'],
     repo: 'https://github.com/Manan-2007/Kinetic-City',
-  },
-  {
-    id: 'virtual-keyboard-mouse',
-    name: 'Virtual Keyboard & Air Mouse',
-    kind: 'Touchless Input System',
-    discipline: 'vision',
-    year: '2026',
-    headline: 'Two hands become two real input devices.',
-    summary:
-      'A computer-vision input system that lets you type and drive the OS cursor with nothing but a webcam. Keystrokes and clicks are injected at the operating-system level, so what you type in the air lands in whatever app is actually focused.',
-    detail: [
-      'The hand tracker labels each hand and gives it a job — right hand steers the real cursor (pinch to click, hold to drag), left hand types on an on-screen keyboard.',
-      'Full layout: number row, three letter rows, and a function row with shift, backspace, space and enter.',
-      'On macOS the keyboard renders as a transparent, click-through overlay above every app and Space, so the target window stays visible on a single laptop screen.',
-    ],
-    stats: [
-      { label: 'Keys', value: '40' },
-      { label: 'Hands tracked', value: '2' },
-      { label: 'Input', value: 'OS-level' },
-    ],
-    stack: ['Python', 'OpenCV', 'MediaPipe', 'NumPy', 'macOS Quartz'],
-    repo: 'https://github.com/Manan-2007/virtual-keyboard-mouse',
-    featured: true,
+    study: true,
   },
   {
     id: 'lily-bloom',
@@ -127,74 +225,6 @@ export const projects = [
     ],
     stack: ['Python', 'OpenCV', 'MediaPipe', 'Flask', 'NumPy'],
     repo: 'https://github.com/Manan-2007/Lily-Flower-Hand-Gesture',
-  },
-  {
-    id: 'f1-club',
-    name: 'F1 Club Chitkara',
-    kind: '3D Web Experience',
-    discipline: 'web',
-    year: '2026',
-    headline: 'A club site built like a race weekend.',
-    summary:
-      'The official site of the F1 Chitkara club — a cinematic web experience pairing motorsport design language with a real-time 3D hero, a mouse-driven camera rig and a studio lighting setup.',
-    detail: [
-      'React Three Fiber scene with a lerped camera rig, HDRI-lit metallic paint, a shadow-catcher floor and runtime bounding-box normalisation so the model sits correctly regardless of export units.',
-      'Device-capability gating drops the 3 MB model entirely on mobile, low-end GPUs and reduced-motion, falling back to a 2D parallax hero.',
-      'GSAP ScrollTrigger reveals, Lenis smooth scroll, route transitions and vendor chunk splitting keep the 3D payload off the critical path.',
-    ],
-    stats: [
-      { label: 'Pages', value: '7' },
-      { label: 'Hero model', value: '3 MB' },
-      { label: 'Renderer', value: 'R3F' },
-    ],
-    stack: ['React', 'Three.js', 'R3F', 'GSAP', 'Lenis', 'Tailwind'],
-    repo: 'https://github.com/Manan-2007/F1_club',
-    live: 'https://f1-club.vercel.app',
-  },
-  {
-    id: 'muse',
-    name: 'Muse.',
-    kind: 'Music Player',
-    discipline: 'web',
-    year: '2026',
-    headline: 'A native-feeling player, in plain JavaScript.',
-    summary:
-      'A responsive, multi-page music player built with no framework and no dependencies — a full audio engine, glassmorphic UI and page transitions that hold up next to a native app.',
-    detail: [
-      'Complete playback engine: play/pause, skip, seek, volume, shuffle and single-track repeat, wired to a 20-track searchable library.',
-      'Album art spins like a record during playback, and the backdrop re-colours itself from the current track’s artwork.',
-      'Seven pages — home feed, player, library, playlists, about and a simulated auth flow persisted in localStorage.',
-    ],
-    stats: [
-      { label: 'Tracks', value: '20' },
-      { label: 'Pages', value: '7' },
-      { label: 'Dependencies', value: '0' },
-    ],
-    stack: ['JavaScript', 'HTML5', 'CSS3', 'Web Audio'],
-    // The repo still advertises muse-five-sooty.vercel.app, but that
-    // deployment 404s — no `live` until it is back up.
-    repo: 'https://github.com/Manan-2007/Muse.',
-  },
-  {
-    id: 'memory-game',
-    name: 'Memory Game',
-    kind: 'Browser Game',
-    discipline: 'web',
-    year: '2025',
-    headline: 'Sixteen cards, one timer, no libraries.',
-    summary:
-      'A card-matching memory game written in vanilla HTML, CSS and JavaScript — jungle animal cards, a live timer, a move counter and 3D flip animations built purely in CSS.',
-    detail: [
-      'Twelve animals in the pool; eight are drawn and shuffled into a fresh 4×4 grid every round.',
-      'Cards flip on a CSS rotateY transform with backface-visibility, so the animation costs nothing at runtime.',
-      'Game logic guards the edge cases — matched cards lock, and only one pair is ever evaluated at a time.',
-    ],
-    stats: [
-      { label: 'Board', value: '4×4' },
-      { label: 'Pairs', value: '8' },
-      { label: 'Card pool', value: '12' },
-    ],
-    stack: ['JavaScript', 'HTML5', 'CSS3'],
-    repo: 'https://github.com/Manan-2007/Memory-Game',
+    study: true,
   },
 ]
