@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion'
 import { navLinks, profile } from '@/data/profile'
 import { scrollToId } from '@/hooks/useLenis'
+import { navigate, useRoute } from '@/lib/route'
 import { EASE } from '@/lib/motion'
 
 /** Marks the section currently occupying the upper third of the viewport. */
@@ -37,6 +38,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const active = useActiveSection(ids)
+  const path = useRoute()
 
   const { scrollYProgress } = useScroll()
   const progress = useSpring(scrollYProgress, {
@@ -62,9 +64,24 @@ export default function Navbar() {
     }
   }, [open])
 
+  // Section links have to work from a case study too, where none of those
+  // sections are mounted — so off the home route they navigate home first and
+  // let App's route effect do the scrolling once it has painted.
   const go = (id) => {
     setOpen(false)
-    scrollToId(id)
+    if (path === '/') scrollToId(id)
+    else navigate(`/#${id}`)
+  }
+
+  const toTop = (event) => {
+    event.preventDefault()
+    if (path !== '/') {
+      navigate('/')
+    } else if (window.lenis) {
+      window.lenis.scrollTo(0)
+    } else {
+      window.scrollTo({ top: 0 })
+    }
   }
 
   return (
@@ -85,14 +102,14 @@ export default function Navbar() {
       >
         {/* Monogram */}
         <a
-          href="#top"
-          onClick={(e) => {
-            e.preventDefault()
-            window.lenis ? window.lenis.scrollTo(0) : window.scrollTo({ top: 0 })
-          }}
+          href="/"
+          onClick={toTop}
           data-cursor="magnet"
           className="group flex items-center gap-3 lg:justify-self-start"
-          aria-label={`${profile.name} — back to top`}
+          /* The visible text is the monogram, so the accessible name has to
+             start with it: WCAG 2.5.3 asks that a label contain the text a
+             speech-input user can actually see to say. */
+          aria-label={`${profile.monogram} — ${profile.name}, back to top`}
         >
           <span className="h-6 w-[2px] bg-red transition-[height] duration-300 group-hover:h-7" />
           <span className="headline text-base tracking-[0.14em]">

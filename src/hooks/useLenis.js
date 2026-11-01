@@ -41,13 +41,19 @@ export function useLenis(enabled) {
   }, [enabled])
 }
 
-/** Scrolls to a section id through Lenis when present, natively otherwise. */
-export function scrollToId(id) {
+/**
+ * Scrolls to a section id through Lenis when present, natively otherwise.
+ *
+ * `immediate` jumps rather than glides — used when arriving from another
+ * route, where a long smooth scroll from the top of a page the visitor has
+ * not seen reads as the site losing their place rather than finding it.
+ */
+export function scrollToId(id, { immediate = false } = {}) {
   const el = document.getElementById(id)
   if (!el) return
   if (window.lenis) {
-    window.lenis.scrollTo(el, { offset: -8 })
+    window.lenis.scrollTo(el, { offset: -8, immediate })
   } else {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    el.scrollIntoView({ behavior: immediate ? 'auto' : 'smooth', block: 'start' })
   }
 }

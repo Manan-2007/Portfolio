@@ -2,8 +2,9 @@ import { useId } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { EASE } from '@/lib/motion'
 import { disciplines } from '@/data/projects'
+import { Link } from '@/lib/router'
 import { RevealItem } from '@/components/ui/Reveal'
-import { ExternalIcon, GitHubIcon, PlusIcon } from '@/lib/icons'
+import { ArrowIcon, ExternalIcon, GitHubIcon, PlusIcon } from '@/lib/icons'
 
 /**
  * One project. Collapsed it reads as a single scannable line — number, name,
@@ -22,6 +23,7 @@ import { ExternalIcon, GitHubIcon, PlusIcon } from '@/lib/icons'
 export default function ProjectRow({ project, index, open, onToggle }) {
   const panelId = useId()
   const tone = disciplines[project.discipline]
+  const study = project.study
 
   return (
     <RevealItem>
@@ -141,7 +143,20 @@ export default function ProjectRow({ project, index, open, onToggle }) {
                     ))}
                   </ul>
 
+                  {/* With a deep page the case study is the primary action and
+                      the two external links step back to ghosts; without one
+                      the live site keeps the emphasis. */}
                   <div className="btn-row mt-8 flex flex-wrap gap-3">
+                    {study && (
+                      <Link
+                        to={`/work/${project.id}`}
+                        data-cursor="magnet"
+                        className="btn btn-primary !px-5 !py-3"
+                      >
+                        Read the case study
+                        <ArrowIcon className="text-[1.05em]" />
+                      </Link>
+                    )}
                     <a
                       href={project.repo}
                       target="_blank"
@@ -156,7 +171,7 @@ export default function ProjectRow({ project, index, open, onToggle }) {
                         href={project.live}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn btn-primary !px-5 !py-3"
+                        className={`btn !px-5 !py-3 ${study ? 'btn-ghost' : 'btn-primary'}`}
                       >
                         Live site
                         <ExternalIcon className="text-[1.05em]" />

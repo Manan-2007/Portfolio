@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import { AnimatePresence, MotionConfig, useReducedMotion } from 'framer-motion'
 import { useDeviceCapability } from '@/hooks/useDeviceCapability'
-import { useLenis } from '@/hooks/useLenis'
+import { useLenis, scrollToId } from '@/hooks/useLenis'
+import { useRoute } from '@/lib/route'
 import { ticker } from '@/data/profile'
 
 import Preloader, { PRELOAD_MS } from '@/components/layout/Preloader'
@@ -18,10 +19,32 @@ import Achievements from '@/components/sections/Achievements'
 import Contact from '@/components/sections/Contact'
 import Marquee from '@/components/ui/Marquee'
 
+/* The case studies are several thousand words of prose that a visitor to the
+   home page never reads. Split out, the same way three.js is — a deep page is
+   a deliberate click, and paying for it on first paint is the wrong trade. */
+const CaseStudy = lazy(() => import('@/components/case/CaseStudy'))
+
+function Home({ ready }) {
+  return (
+    <>
+      <Hero ready={ready} />
+      <Marquee items={ticker} />
+      <About />
+      <Work />
+      <Skills />
+      <Achievements />
+      <Contact />
+    </>
+  )
+}
+
 export default function App() {
   const reduced = useReducedMotion()
   const { isTouch } = useDeviceCapability()
   const [loading, setLoading] = useState(true)
+  const path = useRoute()
+
+  const studyId = path.startsWith('/work/') ? path.slice(6) : null
 
   // Smooth scroll is a desktop nicety; touch platforms already do it better.
   useLenis(!reduced && !isTouch && !loading)
@@ -54,6 +77,34 @@ export default function App() {
     }
   }, [loading])
 
+  /* A route change has to land somewhere deliberate. A hash means the visitor
+     is coming back to a section they were already reading, so jump straight
+     to it; anything else starts at the top. Two frames, because the first one
+     is the render that mounts the destination and the second is the one where
+     it has a height to measure. */
+  useEffect(() => {
+    if (loading) return undefined
+
+    const hash = window.location.hash.slice(1)
+    let inner = 0
+    const outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => {
+        if (hash) {
+          scrollToId(hash, { immediate: true })
+        } else if (window.lenis) {
+          window.lenis.scrollTo(0, { immediate: true })
+        } else {
+          window.scrollTo(0, 0)
+        }
+      })
+    })
+
+    return () => {
+      cancelAnimationFrame(outer)
+      cancelAnimationFrame(inner)
+    }
+  }, [path, loading])
+
   return (
     <MotionConfig reducedMotion="user">
       <a
@@ -70,13 +121,15 @@ export default function App() {
       <Navbar />
 
       <main id="main" className="relative z-10">
-        <Hero ready={!loading} />
-        <Marquee items={ticker} />
-        <About />
-        <Work />
-        <Skills />
-        <Achievements />
-        <Contact />
+        {studyId ? (
+          // Reserves roughly a screen so the footer does not flash up under
+          // the nav while the chunk arrives.
+          <Suspense fallback={<div className="min-h-screen" aria-busy="true" />}>
+            <CaseStudy id={studyId} />
+          </Suspense>
+        ) : (
+          <Home ready={!loading} />
+        )}
       </main>
 
       <Footer />
