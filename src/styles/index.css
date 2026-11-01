@@ -14,6 +14,13 @@
   /* Signal */
   --color-red: #ff1e00;
   --color-red-deep: #b31200;
+  /* Red as a surface under text is a different job from red as a mark. The
+     signal red measures 3.54:1 against --color-white, and 12px bold wants
+     4.5:1 — so every primary button on the site was failing AA. This is the
+     same hue deep enough to carry a label (4.79:1); the hover tier already
+     passed at 6.41:1, which is why only the resting state was wrong. The
+     signal red is unchanged everywhere it is a mark rather than a background. */
+  --color-red-surface: #d81400;
 
   /* Neutrals — strictly tiered. The two dim tiers were originally set by eye
      on a laptop panel; they measured under 4.5:1 on a large, further-away
@@ -84,7 +91,7 @@
   }
 
   ::selection {
-    background: var(--color-red);
+    background: var(--color-red-surface);
     color: var(--color-white);
   }
 
@@ -282,7 +289,7 @@
   }
 
   .btn-primary {
-    background: var(--color-red);
+    background: var(--color-red-surface);
     color: var(--color-white);
   }
   .btn-primary:hover {

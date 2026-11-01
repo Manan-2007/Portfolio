@@ -2,3 +2,8 @@ node_modules
 dist
 .DS_Store
 *.local
+
+# Generated at prebuild by scripts/gen-seo.mjs. Regenerated on every build,
+# including Vercel's, and the lastmod date would churn the diff otherwise.
+public/robots.txt
+public/sitemap.xml
