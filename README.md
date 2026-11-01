@@ -90,6 +90,15 @@ case-study routes. Three real defects came out of that pass and are fixed:
   "Manan Kochhar — back to top", so a speech-input user saying "click MK" hit
   nothing. The name now leads with the monogram.
 
+A later pass opened every credential link rather than trusting its status
+code. Coursera serves `/accomplishments/certificate/<id>` as an empty "Course
+Record" shell — HTTP 200, no content — so **all seven Coursera links answered
+200 while rendering blank pages**. The forms that actually resolve are
+`/verify/<id>` and `/specialization/<id>`. Two titles were wrong against the
+issuer's own record as well. Credentials are now reconciled against Credly and
+Coursera, never against the profile that lists them: LinkedIn still shows a
+course under a name Coursera retired.
+
 `robots.txt` and `sitemap.xml` are generated from `projects.js` by
 `scripts/gen-seo.mjs` at `prebuild`, because a hand-written sitemap stops being
 true the first time a project is added and nobody remembers the file.

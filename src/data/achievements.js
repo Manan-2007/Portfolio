@@ -2,6 +2,13 @@
    Credentials and engineering roles. `icon` resolves against the brand
    table in @/lib/techIcons; issuers without a published mark carry a
    `mono` string instead and render as a lettered tile.
+
+   Every `href` was opened and read before being written here. Coursera's
+   `/accomplishments/certificate/<id>` form returns an empty "Course
+   Record" shell rather than a 404, so seven links on this page pointed at
+   blank pages while still answering 200. The form that renders is
+   `/verify/<id>` for a course and `/specialization/<id>` for a
+   specialisation.
    ──────────────────────────────────────────────────────────────────────── */
 
 export const certificates = [
@@ -15,31 +22,46 @@ export const certificates = [
     icon: 'microsoft',
     year: '2025',
     type: 'Certification',
-    href: 'https://www.credly.com/badges/5847bf49-b3f6-4474-bb38-352728c156e9/linked_in_profile',
+    href: 'https://www.credly.com/badges/5847bf49-b3f6-4474-bb38-352728c156e9/public_url',
   },
   {
-    title: 'Introduction to Generative AI',
-    issuer: 'Google',
+    title: 'Azure Data Fundamentals',
+    code: 'DP-900',
+    issuer: 'Microsoft',
+    icon: 'microsoft',
+    year: '2026',
+    type: 'Certification',
+    href: 'https://www.credly.com/badges/3c2b9e02-cfe8-4dd9-87d7-862c086939ea/public_url',
+  },
+  {
+    /* Coursera calls this "Introduction to Generative AI Learning Path", and
+       the issuer of record is Google Cloud rather than Google. It subsumes the
+       four Feb-2026 component courses (Intro to GenAI, Intro to LLMs, Intro to
+       Responsible AI, Responsible AI with Google Cloud), so only the
+       specialisation is listed — the parts would quadruple the row for one
+       credential. */
+    title: 'Introduction to Generative AI Learning Path',
+    issuer: 'Google Cloud',
     icon: 'google',
     year: '2026',
     type: 'Specialisation',
-    href: 'https://www.coursera.org/account/accomplishments/specialization/certificate/VDTRCKLK20LY',
+    href: 'https://www.coursera.org/account/accomplishments/specialization/VDTRCKLK20LY',
   },
   {
-    title: 'Build RAG Applications',
+    title: 'Build RAG Applications: Get Started',
     issuer: 'IBM',
     icon: 'ibm',
     year: '2026',
     type: 'Certificate',
-    href: 'https://www.coursera.org/account/accomplishments/certificate/9BE91E3XN6NS',
+    href: 'https://www.coursera.org/account/accomplishments/verify/9BE91E3XN6NS',
   },
   {
-    title: 'Develop Generative AI Applications',
+    title: 'Develop Generative AI Applications: Get Started',
     issuer: 'IBM',
     icon: 'ibm',
     year: '2026',
     type: 'Certificate',
-    href: 'https://www.coursera.org/account/accomplishments/certificate/DLJS3455NNEW',
+    href: 'https://www.coursera.org/account/accomplishments/verify/DLJS3455NNEW',
   },
   {
     title: 'AI For Everyone',
@@ -47,7 +69,15 @@ export const certificates = [
     mono: 'DL',
     year: '2025',
     type: 'Certificate',
-    href: 'https://www.coursera.org/account/accomplishments/certificate/PC5962JE1FBR',
+    href: 'https://www.coursera.org/account/accomplishments/verify/PC5962JE1FBR',
+  },
+  {
+    title: 'Cybersecurity for Everyone',
+    issuer: 'University of Maryland',
+    mono: 'UMD',
+    year: '2026',
+    type: 'Certificate',
+    href: 'https://www.coursera.org/account/accomplishments/verify/HU1FNO62FCJR',
   },
   {
     title: 'Python Data Structures',
@@ -55,7 +85,15 @@ export const certificates = [
     mono: 'UM',
     year: '2025',
     type: 'Certificate',
-    href: 'https://www.coursera.org/account/accomplishments/certificate/2YZNHI0UN759',
+    href: 'https://www.coursera.org/account/accomplishments/verify/2YZNHI0UN759',
+  },
+  {
+    title: 'Using Python to Access Web Data',
+    issuer: 'University of Michigan',
+    mono: 'UM',
+    year: '2025',
+    type: 'Certificate',
+    href: 'https://www.coursera.org/account/accomplishments/verify/92EKFGLKE3OE',
   },
   {
     title: 'Crash Course on Python',
@@ -63,15 +101,26 @@ export const certificates = [
     icon: 'google',
     year: '2025',
     type: 'Certificate',
-    href: 'https://www.coursera.org/account/accomplishments/certificate/TKAGYCEAWZUG',
+    href: 'https://www.coursera.org/account/accomplishments/verify/TKAGYCEAWZUG',
   },
   {
-    title: 'Excel Essentials for Data Analytics',
+    title: 'Programming for Everybody',
+    issuer: 'University of Michigan',
+    mono: 'UM',
+    year: '2025',
+    type: 'Certificate',
+    href: 'https://www.coursera.org/account/accomplishments/verify/K76V91UQ8ZHQ',
+  },
+  {
+    /* Coursera has since renamed this course "Excel for Data Analysis:
+       Essential Skills & Techniques"; LinkedIn still shows the old title
+       "Excel Basics for Data Analysis". The verify link is authoritative. */
+    title: 'Excel for Data Analysis',
     issuer: 'IBM',
     icon: 'ibm',
     year: '2025',
     type: 'Certificate',
-    href: 'https://www.coursera.org/account/accomplishments/certificate/R3H9HS663F1K',
+    href: 'https://www.coursera.org/account/accomplishments/verify/R3H9HS663F1K',
   },
 ]
 
