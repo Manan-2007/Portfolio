@@ -22,39 +22,17 @@ are used **only** for data, never for decoration.
 
 ## Hero — the aero field
 
-The centrepiece is a wind tunnel that is actually solved, not a car model and
-not a curve shaped to look like flow.
+The centrepiece is an original wind-tunnel visualisation, not a car model.
 
-Every frame, an incompressible Navier–Stokes field is computed on the GPU over
-a 22 × 11 world-unit domain at 256 × 128 — Stam's stable fluids, in the order
-GPU Gems 38 sets out: semi-Lagrangian advection, forces, vorticity
-confinement, divergence, twenty Jacobi pressure sweeps, then subtract the
-pressure gradient so the field comes out divergence-free. 8,192 streaklines are
-carried through the result. They go where the solver sends them, which is why
-the wake sheds on its own rather than being told to.
+Roughly 6,400 streaklines travel along the flow axis past an **invisible
+aerofoil**. Each streak is a two-vertex line segment whose head and tail are
+displaced by the same analytic flow field in a vertex shader, so the entire
+scene is **one draw call with zero per-particle CPU work**. Where the flow
+accelerates around the body it heats from silver to red, the way a pressure map
+reads in CFD. The pointer acts as a second, softer pressure source.
 
-The body is a real NACA 4-digit symmetric section at thirteen degrees, held at
-no-slip. An ellipse has no trailing edge, and the trailing edge is the thing
-that sheds.
-
-Measured on the running page rather than asserted:
-
-| | |
-|---|---|
-| Shedding frequency | ~0.67 Hz — St ≈ 0.25 on `D = c·sin α`, the canonical band |
-| Disturbed air | 27% of the visible frame |
-| Frame time | 13.3 ms mean, 14.3 ms p95, no frame over 20 ms |
-| Draw calls for 8,192 streaks | 1 |
-
-Colour is speed relative to freestream, split either side of it: acceleration
-over the suction surface heats toward red, and the momentum deficit in the wake
-gives up brightness. Both are the quantity a CFD velocity-magnitude map plots.
-The pointer pushes the air with its own travel velocity, so a cursor sitting
-still disturbs nothing.
-
-- Thirteen degrees is past the stall angle, deliberately. At a believable
-  cruise incidence the disturbance measured four per cent of the frame:
-  correct, and invisible.
+- Solved per-vertex for the body (streaks *bend* past it) and once-per-streak
+  for the pointer wake (otherwise every streak shears into a spike).
 - Camera drifts toward the pointer on a heavy lerp — long-lens feel.
 - `frameloop` is cut dead when the hero scrolls out of view.
 - Three.js is lazily imported and mounted on idle, so it never touches the
@@ -66,7 +44,6 @@ still disturbs nothing.
 |---|---|
 | Critical path (gzip) | **151 kB** — React, Framer Motion, app and CSS |
 | Deferred (gzip) | ~238 kB — three + R3F, desktop only, after idle |
-| Deferred (gzip) | ~6 kB — the fluid solver and its shaders |
 | Deferred (gzip) | ~15 kB — case studies, on `/work/*` only |
 | 3D gating | WebGL + not mobile + not reduced-motion + >4 cores |
 | Fallback | Inline SVG streamlines — no script, no request |
@@ -156,8 +133,7 @@ src/
 ├── hooks/         usePointer · useDeviceCapability · useLenis
 ├── styles/        index.css — @theme tokens + component layer
 └── components/
-    ├── three/     AeroField · CameraRig · HeroCanvas · CanvasBoundary
-    │   └── fluid/ FluidSolver.js (passes, targets) · glsl.js (shaders)
+    ├── three/     AeroField (GLSL) · CameraRig · HeroCanvas · CanvasBoundary
     ├── layout/    Preloader · Navbar · Cursor · GridOverlay · Footer
     ├── ui/        Reveal · Magnetic · SectionHeader · Button · Marquee
     ├── work/      ProjectRow — the collapsed/expanded list row
